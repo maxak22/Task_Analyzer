@@ -1,0 +1,32 @@
+venv/
+*.pyc
+__pycache__/
+db.sqlite3
+.env
+node_modules/
+.DS_Store
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+Thumbs.db
+
+# Python
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# Django
+*.sqlite3
+/staticfiles/
+/media/
+
+# Optional
+.env.local

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Task Analyzer - Smart Prioritization</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🎯 Task Analyzer</h1>
+            <p>Smart Task Prioritization with Dependency Analysis</p>
+        </header>
+        <div class="content">
+            <aside class="sidebar">
+                <div class="form-section">
+                    <h2>➕ Add New Task</h2>
+                    
+                    <form id="taskForm">
+                        <div class="form-group">
+                            <label for="title">Task Title *</label>
+                            <input 
+                                type="text" 
+                                id="title" 
+                                placeholder="What do you need to do?" 
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dueDate">Due Date</label>
+                            <input 
+                                type="date" 
+                                id="dueDate"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="effort">Estimated Hours</label>
+                            <input 
+                                type="number" 
+                                id="effort" 
+                                placeholder="0" 
+                                min="0" 
+                                step="0.5"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="importance">Importance (1-10)</label>
+                            <input 
+                                type="range" 
+                                id="importance" 
+                                min="1" 
+                                max="10" 
+                                value="5"
+                            >
+                            <span id="importanceValue">5</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Dependencies</label>
+                            <div id="dependenciesContainer" class="dependencies-container"></div>
+                            <div id="selectedDeps" class="selected-deps"></div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">➕ Add Task</button>
+                    </form>
+                </div>
+
+            
+                <div class="strategy-section">
+                    <h3>📊 Analysis Strategy</h3>
+                    <select id="strategySelect" class="strategy-select">
+                        <option value="smart_balance">⚖️ Smart Balance</option>
+                        <option value="fastest_wins">⚡ Fastest Wins</option>
+                        <option value="high_impact">💎 High Impact</option>
+                        <option value="deadline_driven">📅 Deadline Driven</option>
+                    </select>
+                    <p id="strategyDescription" style="margin-top: 10px; font-size: 0.9em; color: #666;"></p>
+                </div>
+
+                <div class="bulk-import-section">
+                    <h3>📥 Bulk Import Tasks</h3>
+                    <p class="section-hint">Paste JSON array of tasks to import multiple tasks at once</p>
+                    
+                    <textarea 
+                        id="bulkImportJson" 
+                        class="bulk-import-textarea" 
+                        placeholder='[
+      {
+        "title": "Task 1",
+        "due_date": "2025-12-31",
+        "estimated_hours": 5,
+        "importance": 8,
+        "description": "Optional description"
+      },
+      {
+        "title": "Task 2",
+        "due_date": "2025-12-25",
+        "estimated_hours": 3,
+        "importance": 7,
+        "dependencies": [1]
+      }
+    ]'></textarea>
+                    
+                    <div class="bulk-import-actions">
+                        <button type="button" class="btn btn-primary" onclick="validateAndImportTasks()">
+                            ✅ Import Tasks
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="loadTemplateExample()">
+                            📋 Load Example
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="exportAllTasks()">
+                            📤 Export Tasks
+                        </button>
+                    </div>
+                    
+                    <div id="bulkImportStatus" class="bulk-import-status"></div>
+                </div>
+
+                <div class="import-help">
+                    <details>
+                        <summary>❓ How to use Bulk Import</summary>
+                        <div class="help-content">
+                            <h4>JSON Format:</h4>
+                            <ul>
+                                <li><strong>title</strong> (required): Task name</li>
+                                <li><strong>due_date</strong> (optional): YYYY-MM-DD format</li>
+                                <li><strong>estimated_hours</strong> (optional): Number of hours</li>
+                                <li><strong>importance</strong> (optional): 1-10 scale</li>
+                                <li><strong>dependencies</strong> (optional): Array of task IDs</li>
+                            </ul>
+                            <h4>Limits:</h4>
+                            <ul>
+                                <li>Maximum 100 tasks per import</li>
+                                <li>Title is required for each task</li>
+                                <li>Importance must be 1-10</li>
+                                <li>Dependencies will be validated</li>
+                            </ul>
+                            <h4>Example:</h4>
+                            <pre><code>[
+  {
+    "title": "Design Database",
+    "due_date": "2025-12-20",
+    "estimated_hours": 8,
+    "importance": 9
+  },
+  {
+    "title": "Implement API",
+    "due_date": "2025-12-27",
+    "estimated_hours": 16,
+    "importance": 9,
+    "dependencies": [1]
+  }
+]</code></pre>
+                        </div>
+                    </details>
+                </div>
+            </aside>
+
+           
+            <main class="main">
+               
+                <section class="tasks-section">
+                    <div class="section-header">
+                        <h2>📋 Your Tasks</h2>
+                        <span class="task-count">(<span id="taskCount">0</span> tasks)</span>
+                    </div>
+                    <div id="tasksList" class="tasks-list"></div>
+                </section>
+
+           
+                <div class="analyze-section">
+                    <button id="analyzeBtn" class="btn btn-analyze">
+                        🚀 Analyze Tasks
+                    </button>
+                </div>
+
+               
+                <section id="resultsSection" class="results-section" style="display: none;">
+                    <h2>📈 Analysis Results</h2>
+                    <div id="results" class="results-container"></div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <div id="loader" class="loader" style="display: none;">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
